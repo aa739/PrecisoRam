@@ -1,0 +1,11 @@
+{% extends 'precisoram/base.html' %}
+{% block content %}
+<h2>Login</h2>
+<form method="POST">
+    {% csrf_token %}
+    <input type="text" name="numero" placeholder="Ex: ABCD1234EFGH" required>
+    <button type="submit">Entrar</button>
+</form>
+<p><a href="{% url 'registar_mullvad' %}">Criar nova conta →</a></p>
+<p><a href="{% url 'lista_produtos' %}">Continuar sem login</a></p>
+{% endblock %}

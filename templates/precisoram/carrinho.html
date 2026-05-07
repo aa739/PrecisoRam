@@ -1,0 +1,97 @@
+{% extends 'precisoram/base.html' %}
+{% block content %}
+<style>
+    .cart-item {
+        border-bottom: 1px solid #ddd;
+        padding: 15px 0;
+        display: flex;
+        gap: 20px;
+        align-items: center;
+    }
+    .cart-image {
+        width: 80px;
+        height: 80px;
+        object-fit: contain;
+    }
+    .cart-details {
+        flex: 1;
+    }
+    .cart-name {
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+    .cart-url a {
+        color: #1e4f9b;
+        text-decoration: none;
+        font-size: 0.8rem;
+    }
+    .cart-url a:hover {
+        text-decoration: underline;
+    }
+    .cart-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+    .btn-remover {
+        background-color: #dc3545;
+        padding: 5px 12px;
+    }
+    .total {
+        font-size: 1.3rem;
+        font-weight: bold;
+        margin-top: 20px;
+    }
+    .actions {
+        margin-top: 20px;
+        display: flex;
+        gap: 15px;
+    }
+    .btn-danger {
+        background-color: #dc3545;
+    }
+    .btn-danger:hover {
+        background-color: #c82333;
+    }
+</style>
+
+<h2>Meu Carrinho</h2>
+
+{% if itens %}
+    {% for item in itens %}
+    <div class="cart-item">
+        <div>
+            {% if item.produto.imagem %}
+                <img class="cart-image" src="{{ item.produto.imagem }}" alt="{{ item.produto.nome }}">
+            {% else %}
+                <div class="cart-image" style="background:#eee; display:flex; align-items:center; justify-content:center;">🖥️</div>
+            {% endif %}
+        </div>
+        <div class="cart-details">
+            <div class="cart-name">{{ item.produto.nome }}</div>
+            <div>Preço: {{ item.produto.preco }}€</div>
+            <div>Quantidade: {{ item.quantidade }}</div>
+            <div>Subtotal: {{ item.subtotal }}€</div>
+            <div class="cart-url">
+                <a href="{{ item.produto.url }}" target="_blank" rel="noopener noreferrer">link</a>
+            </div>
+        </div>
+        <div class="cart-actions">
+            <a href="{% url 'remover_do_carrinho' item.produto.id %}" class="btn btn-remover">Remover</a>
+        </div>
+    </div>
+    {% endfor %}
+    <div class="total">Total: {{ total }}€</div>
+    <div class="actions">
+        <a href="{% url 'lista_produtos' %}" class="btn">Continuar comprando</a>
+        <a href="{% url 'exportar_csv' %}" class="btn">📥 Exportar CSV</a>
+        <a href="{% url 'remover_tudo_carrinho' %}" class="btn btn-danger" onclick="return confirm('Tem a certeza?');">
+           Remover tudo
+        </a>
+</div>
+{% else %}
+    <p>Carrinho vazio.</p>
+    <a href="{% url 'lista_produtos' %}" class="btn">Ver produtos</a>
+{% endif %}
+
+{% endblock %}

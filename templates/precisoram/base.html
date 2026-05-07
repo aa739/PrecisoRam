@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrecisoRAM</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7fa;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        /* Cabeçalho */
+        header {
+            background: #1e4f9b;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .logo a {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        .nav-links a:hover {
+            background: #0e3a6e;
+        }
+        .user-info {
+            background: #0e3a6e;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        /* Mensagens flash */
+        .messages {
+            margin: 15px auto;
+            max-width: 1200px;
+            padding: 0 20px;
+        }
+        .alert {
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .alert-info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .alert-warning {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        } 
+        /* Conteúdo principal */
+        .content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        /* Botões e formulários básicos */
+        button, .btn {
+            background: #1e4f9b;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        button:hover, .btn:hover {
+            background: #0e3a6e;
+        }
+        input, select {
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 15px;
+            background: #ddd;
+            color: #333;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <a href="{% url 'lista_produtos' %}">🖥️ PrecisoRAM</a>
+        </div>
+        <div class="nav-links">
+    <a href="{% url 'lista_produtos' %}">Produtos</a>
+    <a href="{% url 'ver_carrinho' %}">🛒 Carrinho</a>
+
+    {% if user.is_authenticated and user.is_staff %}
+        <span class="user-info">👑 {{ user.username }}</span>
+        <!-- FORMULÁRIO POST para logout do admin -->
+        <form action="{% url 'admin:logout' %}" method="POST" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" style="background: none; border: none; color: white; cursor: pointer; text-decoration: underline; padding: 0;">
+                Sair (Admin)
+            </button>
+        </form>
+
+    {% elif request.session.numero_utilizador %}
+        <span class="user-info">🔒 {{ request.session.numero_utilizador }}</span>
+        <a href="{% url 'logout_mullvad' %}">Sair</a>
+
+    {% else %}
+        <a href="{% url 'login_mullvad' %}">Login</a>
+        <a href="{% url 'registar_mullvad' %}">Registar</a>
+    {% endif %}
+</div>
+    </header>
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="container">
+        <div class="content">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2026 PrecisoRAM
+    </footer>
+</body>
+</html>

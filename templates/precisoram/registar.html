@@ -1,0 +1,29 @@
+{% extends 'precisoram/base.html' %}
+{% block content %}
+<h2>Criar nova conta</h2>
+<p>Será gerado um número único. <strong>Guarde-o porque não é possível recuperar</strong>.</p>
+
+{% if novo_numero %}
+<div style="background-color: #d4edda; border: 2px solid #28a745; border-radius: 8px; padding: 20px; margin: 20px 0; text-align: center;">
+    <p style="font-size: 1.2rem;">✅ Conta criada com sucesso!</p>
+    <p style="font-size: 1.5rem; font-weight: bold; letter-spacing: 2px; background: #fff; display: inline-block; padding: 10px 20px; border-radius: 6px;">
+        {{ novo_numero }}
+    </p>
+    <p style="margin-top: 15px; color: #155724;">
+        ⚠️ <strong>Copie este número e guarde-o num local seguro</strong>. Não será possível recuperá-lo.
+    </p>
+    <button onclick="navigator.clipboard.writeText('{{ novo_numero }}')" style="margin-top: 10px; padding: 8px 16px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">
+        📋 Copiar número
+    </button>
+</div>
+<div style="text-align: center;">
+    <a href="{% url 'lista_produtos' %}" class="btn">Continuar para a loja</a>
+</div>
+{% else %}
+<form method="POST">
+    {% csrf_token %}
+    <button type="submit" class="btn">Gerar número e criar conta</button>
+</form>
+<p style="margin-top: 15px;"><a href="{% url 'login_mullvad' %}">Já tenho um número →</a></p>
+{% endif %}
+{% endblock %}

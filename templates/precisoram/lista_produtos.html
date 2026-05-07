@@ -1,0 +1,165 @@
+{% extends 'precisoram/base.html' %}
+{% block content %}
+<style>
+    .product-list {
+        list-style: none;
+        padding: 0;
+    }
+    .product-item {
+        display: flex;
+        gap: 20px;
+        padding: 15px 0;
+        border-bottom: 1px dashed #aaa;
+    }
+    .product-image {
+        flex-shrink: 0;
+        width: 100px;
+        height: 100px;
+        object-fit: contain;
+        background: #f0f0f0;
+        border-radius: 6px;
+    }
+    .product-details {
+        flex-grow: 1;
+    }
+    .product-title {
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+    .product-price {
+        color: #27ae60;
+        font-weight: bold;
+    }
+    .btn-small {
+        background: #1e4f9b;
+        padding: 4px 10px;
+        font-size: 0.8rem;
+        margin-top: 5px;
+    }
+    .btn-scraping {
+        background-color: #28a745;
+    }
+    .btn-scraping:hover {
+        background-color: #218838;
+    }
+    .produto-adicionado {
+        background-color: #d4edda !important;
+        border-left: 4px solid #28a745;
+        border-radius: 6px;
+        transition: background-color 0.3s ease;
+    }
+
+    /* ---- Estilos uniformes para todos os botões do formulário ---- */
+    .filters {
+        margin-bottom: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+    }
+    .filters input, 
+    .filters select,
+    .filters .btn,
+    .filters button.btn {
+        height: 42px;
+        box-sizing: border-box;
+        margin: 0;
+        vertical-align: middle;
+        font-size: 14px;
+        font-family: inherit;
+    }
+    .filters .btn,
+    .filters button.btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        line-height: 1;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+        padding: 0 12px;
+    }
+    .filters button.btn {
+        width: 120px;
+        background: #1e4f9b;
+        color: white;
+    }
+    .filters .btn-limpar {
+        width: 120px;
+        background: #e74c3c;
+        color: white;
+    }
+    .filters input, .filters select {
+        padding: 0 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background: white;
+    }
+</style>
+
+<form method="GET" class="filters">
+    <input type="text" name="min_preco" placeholder="Preço mínimo" size="8" value="{{ min_preco|default:'' }}">
+    <input type="text" name="max_preco" placeholder="Preço máximo" size="8" value="{{ max_preco|default:'' }}">
+    
+    <select name="velocidade">
+        <option value="">Velocidade (MHz)</option>
+        {% for v in velocidades %}
+            <option value="{{ v }}" {% if velocidade_selecionada == v %}selected{% endif %}>{{ v }}</option>
+        {% endfor %}
+    </select>
+    
+    <select name="marca">
+        <option value="">Marca</option>
+        {% for m in marcas %}
+            <option value="{{ m.id }}" {% if marca_selecionada|stringformat:'s' == m.id|stringformat:'s' %}selected{% endif %}>{{ m.nome }}</option>
+        {% endfor %}
+    </select>
+    
+    <select name="order" onchange="this.form.submit()">
+        <option value="">Ordenar por</option>
+        <option value="asc" {% if order_selecionado == 'asc' %}selected{% endif %}>Preço: menor para maior</option>
+        <option value="desc" {% if order_selecionado == 'desc' %}selected{% endif %}>Preço: maior para menor</option>
+    </select>
+    
+    <button type="submit" class="btn">Filtrar</button>
+    <a href="{% url 'lista_produtos' %}" class="btn btn-limpar">Limpar</a>
+    <a href="{% url 'scraping' %}" class="btn btn-scraping">Atualizar BD</a>
+</form>
+
+<ul class="product-list">
+{% for p in produtos %}
+    <li class="product-item {% if request.GET.adicionado == p.id|stringformat:'s' %}produto-adicionado{% endif %}">
+        <div>
+            {% if p.imagem %}
+                <img class="product-image" src="{{ p.imagem }}" alt="{{ p.nome }}">
+            {% else %}
+                <div class="product-image" style="display: flex; align-items: center; justify-content: center; background: #ddd;">
+                    🖥️
+                </div>
+            {% endif %}
+        </div>
+        <div class="product-details">
+            <div class="product-title">{{ p.nome }}</div>
+            <div>Marca: {{ p.marca.nome|default:"-" }} | Velocidade: {{ p.velocidade|default:"-" }}</div>
+            <div class="product-price">{{ p.preco }} €</div>
+            <div>{{ p.loja }}</div>
+            
+            <form method="GET" action="{% url 'adicionar_carrinho' p.id %}" style="display:inline;">
+                {% if min_preco %}<input type="hidden" name="min_preco" value="{{ min_preco }}">{% endif %}
+                {% if max_preco %}<input type="hidden" name="max_preco" value="{{ max_preco }}">{% endif %}
+                {% if velocidade_selecionada %}<input type="hidden" name="velocidade" value="{{ velocidade_selecionada }}">{% endif %}
+                {% if marca_selecionada %}<input type="hidden" name="marca" value="{{ marca_selecionada }}">{% endif %}
+                {% if order_selecionado %}<input type="hidden" name="order" value="{{ order_selecionado }}">{% endif %}
+                <button type="submit" class="btn btn-small">+ Carrinho</button>
+            </form>
+            
+            <a href="{{ p.url }}" target="_blank" style="margin-left: 10px;">Ver na loja</a>
+        </div>
+    </li>
+{% empty %}
+    <li>Nenhum produto encontrado.</li>
+{% endfor %}
+</ul>
+{% endblock %}
